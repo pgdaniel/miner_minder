@@ -1,6 +1,7 @@
 # miner_minder
 WIP!
-Auto Select config file for ethos
+
+Auto-select best pool to use via whattomine.com
 
 Sample config
 
