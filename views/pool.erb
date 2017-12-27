@@ -1,44 +1,13 @@
-#globalminer ewbf-zcash
-#globalminer claymore
-globalminer etherminer
-#globalminer ccminer
+globalminer <%= current_config['miner_to_use'] %>
 
 maxgputemp 85
 stratumproxy enabled
-
-#hush
-#proxywallet t1QvecsrZwuhnsoBTBJiptbVxa8jazMBE5S
-#proxypool1 mining.miningspeed.com:3052
-
-#metaverse
-#proxywallet MSxvoXsbaWykgYxLbQaF9a35rpYKpZuZYV
-#proxypool1 mine.etp.fairpool.xyz:6666
-
-#ubiq
-#proxywallet 0x461983Bd580A4D69c639ac75083600735A0E604A
-#proxypool1 ubiq-us.maxhash.org:8008
-
-#expanse
-proxywallet 0x5E03d61e5783E91b7D4a3381A7F9f093eD49a532
-proxypool1 exp-us.maxhash.org:8010
-
-#music
-#proxywallet 0x7ce2b060b4b150718d296e09279f5faa98bb48f7
-#proxypool1 mc-us.maxhash.org:8009
-
-# ether
-#proxywallet 0x92ac112Ab7da45e9B1393616316E4E8686BCE848
-#proxypool1 us1.ethpool.org:3333
-#proxypool2 us2.ethpool.org:3333
-#proxypool1 pool-usa.ethosdistro.com:5001
-#proxypool2 pool-eu.ethosdistro.com:5001
-
-#monero
-#proxywallet 42iFfxqvLwnUhsPQY6WHYAKbJsFxLmLESck9cBKBNwstgaRCSPM53yxFrY2vPiDFP9TkGtqSqg2RyKZ9XtJbFNj6CpLvaTP
-#proxypool1 la01.supportxmr.com:5555
-#proxypool2 us-backup.supportxmr.com:5555
-
+globalfan 85
 flags --cl-global-work 8192 --farm-recheck 200
 
-globalfan 85
+proxywallet <%= current_config['wallet'] %>
+proxypool1 <%= current_config['pool']['url_1'] %>
 
+<% if current_config['pool']['url_2'] %>
+  proxypool2 <%= current_config['pool']['url_2'] %>
+<% end %>

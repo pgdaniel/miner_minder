@@ -6,63 +6,53 @@ require 'net/http'
 require 'net/https'
 require 'yaml'
 require 'json'
-
-CONFIG = YAML.load_file('config.yml')
+require 'pry'
 
 get '/pool.txt' do
-  # if pool_threshold_reached?
-  #   if best_to_mine == currently_mining
-  #     # keep mining what we are mining
-  #     true
-  #   else
-  #     false
-  #   end
-  #
-  # else
-  #   # first check if we have that setup
-  #   if pool_configured?(best_to_mine)
-  #     switch_pool(best_to_mine)
-  #   else
-  #     "do nothing"
-  #   end
-  # end
-  #
-  #erb :pool, content_type: 'text/plain', layout: false
-
-  what_to_mine['tag']
+  switch_pool(best_to_mine) unless already_mining_best?
+  erb :pool, content_type: 'text/plain', layout: false
 end
 
 get '/status' do
-  'ETH'
+  currently_mining
+end
+
+def already_mining_best?
+  best_to_mine == currently_mining
 end
 
 def currently_mining
-  'ETH'
+  YAML::load_file('current.yml')['currently_mining']
+end
+
+def config
+  YAML::load_file('config.yml')
+end
+
+def current_config
+  @current_config ||= config['coins'].select { |c| c['abbr'] == currently_mining }.first
 end
 
 private
 
-def what_to_mine_url
-  CONFIG['whattomine_url']
+def pool_configured?(coin)
+  config['coins'].select { |c| c['abbr'] == coin }.count > 0
 end
 
-def pool_threshold_reached?
-  # check pool api if have enough for a payout
-  true
-end
+def switch_pool(best_to_mine)
+  return unless pool_configured?(best_to_mine)
 
-def pool_configured?
-  true
+  current = YAML::load_file('current.yml')
+  current['currently_mining'] = best_to_mine
+  File.open('current.yml', 'w') { |f| f.write current.to_yaml }
 end
 
 def best_to_mine
-  # the abbr for the coin that's best to mine goes here
-  'ETH'
+  @best_to_mine ||= what_to_mine['tag']
 end
 
-def switch_miner(best_to_mine)
-  # check if we have that in the config otherwise skip and go for another interation
-  true
+def what_to_mine_url
+  config['whattomine_url']
 end
 
 def what_to_mine
@@ -79,8 +69,10 @@ def what_to_mine
 
   # get the key of the best coin to mine so we can
   # get all the data
+  # TODO get next best if not configured
   json_res['coins'][json_res['coins'].keys.first]
 rescue StandardError => e
   puts "HTTP Request failed (#{e.message})"
   # continue on
+  currently_mining
 end
