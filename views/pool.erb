@@ -7,7 +7,6 @@ flags --cl-global-work 8192 --farm-recheck 200
 
 proxywallet <%= current_config['wallet'] %>
 proxypool1 <%= current_config['pool']['url_1'] %>
-
 <% if current_config['pool']['url_2'] %>
-  proxypool2 <%= current_config['pool']['url_2'] %>
+proxypool2 <%= current_config['pool']['url_2'] %>
 <% end %>
