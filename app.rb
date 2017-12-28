@@ -9,7 +9,11 @@ require 'json'
 require 'pry'
 
 get '/pool.txt' do
-  switch_pool(best_to_mine) unless already_mining_best?
+  if locked?
+    switch_pool(locked_config['abbr'])
+  else
+    switch_pool(best_to_mine) unless already_mining_best?
+  end
   erb :pool, content_type: 'text/plain', layout: false
 end
 
@@ -33,17 +37,26 @@ def current_config
   @current_config ||= config['coins'].select { |c| c['abbr'] == currently_mining }.first
 end
 
+def locked_config
+  @current_config ||= config['coins'].select { |c| c['locked'] == true }.first
+end
+
+def locked?
+  !!locked_config
+end
+
 private
 
 def pool_configured?(coin)
   config['coins'].select { |c| c['abbr'] == coin }.count > 0
 end
 
-def switch_pool(best_to_mine)
-  return unless pool_configured?(best_to_mine)
+def switch_pool(coin_to_mine)
+  binding.pry
+  return unless pool_configured?(coin_to_mine)
 
   current = YAML::load_file('current.yml')
-  current['currently_mining'] = best_to_mine
+  current['currently_mining'] = coin_to_mine
   File.open('current.yml', 'w') { |f| f.write current.to_yaml }
 end
 
