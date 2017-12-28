@@ -52,7 +52,6 @@ def pool_configured?(coin)
 end
 
 def switch_pool(coin_to_mine)
-  binding.pry
   return unless pool_configured?(coin_to_mine)
 
   current = YAML::load_file('current.yml')
